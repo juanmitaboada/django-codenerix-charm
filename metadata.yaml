@@ -1,0 +1,26 @@
+# This file populates the Overview on Charmhub.
+# See https://juju.is/docs/sdk/metadata-reference for a checklist and guidance.
+
+# The charm package name, no spaces (required)
+# See https://juju.is/docs/sdk/naming#heading--naming-charms for guidance.
+name: django-codenerix
+ 
+# The following metadata are human-readable and will be published prominently on Charmhub.
+
+# (Recommended)
+display-name: Django Codenerix
+
+# (Required)
+summary: Open Source ERP built on top of Django + AngularJS + Bootstrap
+
+description: |
+  Open source enterprise business management system built on top of Django + AngularJS + Bootstrap.
+ 
+  This framework is ready for fast development of any CMS, ERP, Business Management Software.
+
+storage:
+  media:
+    type: filesystem
+    description: Storage for media files
+    minimum-size: 500M
+    location: /code/media
