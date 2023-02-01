@@ -1,14 +1,273 @@
-# This file defines charm config options, and populates the Configure tab on Charmhub.
-# If your charm does not require configuration options, delete this file entirely.
-#
-# See https://juju.is/docs/config for guidance.
-
 options:
-  # An example config option to customise the log level of the workload
-  log-level:
-    description: |
-      Configures the log level of gunicorn. 
-
-      Acceptable values are: "info", "debug", "warning", "error" and "critical"
-    default: "info"
-    type: string
+    site_secret_key:
+        type: string
+        default: ''
+        description: |
+          The web site secret key. Leave empty will generate one.
+          NOTE: You **NEED** to set this in a multi-units architecture or you will
+          have some trouble.
+    django_version:
+        type: string
+        default: "distro"
+        description: |
+          Version or origin from which to install.  May be one of the following:
+          distro (default), ppa:somecustom/ppa, a deb url sources entry or
+          a valid pip line like 'Django' or 'Django==1.5' or a reposiroty url (without the -e).
+          Leaving it empty if you don't want the charm to install Django.
+    vcs:
+        type: string
+        default: ""
+        description: |
+          The vcs software to use. Only hg, git, bzr, and svn are currently supported.
+    repos_url:
+        type: string
+        default: ""
+        description: The vcs url to checkout.
+    repos_username:
+        type: string
+        default: ""
+        description: |
+            The vcs user name.
+            Note: *Subversion only* settings. For other vcs use the repos_url for auth.
+    repos_password:
+        type: string
+        default: ""
+        description: |
+            The vcs password.
+            Note: *Subversion only* settings. For other vcs use the repos_url for auth.
+    repos_branch:
+        type: string
+        default: ""
+        description: |
+          The repo branch to pull out from. If empty, it will pull out the
+          default branch or trunk (such as origin/master with git).
+          Note that this setting only applies to git. This option is not
+          supported for hg. For svn and bzr, specify the branch name as
+          part of the URL.
+    project_template_url:
+        type: string
+        default: ""
+        description: |
+          If not repository url is found, the charm will create a new project. This
+          option is the --template argument value for the startproject command
+          to use a custom project template.
+          
+          Django will also accept URLs (http, https, ftp) to compressed
+          archives with the app template files, downloading and extracting them on the fly.
+          For more informations see:
+            https://docs.djangoproject.com/en/dev/ref/django-admin/#startproject-projectname-destination
+    project_template_extension:
+        type: string
+        default: ""
+        description: |
+          When Django copies the project template files, it also renders certain
+          files through the template engine: the files whose extensions match the
+          --extension option (py by default) and the files whose names are passed with
+          the --name option.
+    install_root:
+        type: string
+        default: "/srv/"
+        description: The root directory to checkout to.
+    application_path:
+        type: string
+        default: ""
+        description: |
+          The relative path to install_root where the manage.py
+          script is located.
+    additional_distro_packages:
+        type: string
+        default: "python-imaging,python-docutils,python-tz"
+        description: |
+          Comma separated extra packages to install.
+    additional_pip_packages:
+        type: string
+        default: ""
+        description: |
+          Comma separated extra packages to install.
+    requirements_pip_files:
+        type: string
+        default: ""
+        description: |
+          Comma separated relative paths or urls to a requirement files. Note that the charm
+          won't manually upgrade packages defined in this file.
+          Leave the variable to an empty string if you don't want the feature.
+    pip_extra_args:
+        type: string
+        default: ""
+        description: |
+          Extra arguments passed to pip.
+    requirements_apt_files:
+        type: string
+        default: ""
+        description: |
+          Comma separated relative paths to requirement files. Note that the charm
+          won't manually upgrade packages defined in this file.
+          Leave the variable to an empty string if you don't want the feature.
+    django_settings:
+        type: string
+        default: ""
+        description: |
+          The Python path to your Django settings module.
+          Leave it empty if your settings file is at the root of your repos.
+    django_south:
+        type: boolean
+        default: False
+        description: |
+          Enable the use of south migrations
+    django_south_version:
+        type: string
+        default: "distro"
+        description: |
+          Version or origin from which to install.  May be one of the following:
+          distro (default), ppa:somecustom/ppa, a deb url sources entry or
+          a valid pip line like 'South' or 'South==0.8.4' or a reposiroty url (without the -e).
+          Leaving it empty if you don't want the charm to install South.
+    django_debug:
+        type: boolean
+        default: False
+        description: |
+          Enable disable settings.DEBUG for django
+    django_allowed_hosts:
+        type: string
+        default: ""
+        description: |
+          A space separated list for settings.ALLOWED_HOSTS in django. Default
+          value will be the hostname, fully-qualified name, and public IP.
+        default: ""
+    django_extra_settings:
+        type: string
+        default: ""
+        description: |
+          Allows setting up extra settings.* values for Django. Acceptable
+          values are limited to comma delimited key-value pairs like:
+            SETTING_X=foo, SETTING_Y=bar
+        default: ""
+    urls_dir_name:
+        type: string
+        default: "juju_urls"
+        description: |
+          The name of the directory where generated url will be written.
+          Set the variable to an empty string if you don't want the feature.
+    urls_injection_path:
+        type: string
+        default: "urls.py"
+        description: |
+          The place where the code injection path will be append.
+          This is relative to the urls_dir_name path define earlier.
+    settings_dir_name:
+        type: string
+        default: "juju_settings"
+        description: |
+          The name of the directory where generated settings will be written.
+          Set the variable to an empty string if you don't want the feature.
+    settings_injection_path:
+        type: string
+        default: "settings.py"
+        description: |
+          The place where the code injection path will be append.
+          This is relative to the settings_dir_name path define earlier.
+    settings_database_name:
+        type: string
+        default: "60-%(engine_name)s.py"
+        description: |
+          The place where the database configuration will be appended or written.
+          Set the variable to an empty string if you don't want the feature.
+    settings_secret_key_name:
+        type: string
+        default: "60-secret.py"
+        description: |
+          The place where the secret key configuration will be appended or written.
+          Set the variable to an empty string if you don't want the feature.
+    settings_amqp_name:
+        type: string
+        default: "60-amqp.py"
+        description: |
+          The place where the amqp configuration will be appended or written.
+    celery_always_eager:
+        type: string
+        default: "False"
+        description: If True, all tasks will be executed locally by blocking until the task returns.
+    celery_amqp_vhost:
+        type: string
+        default: ""
+        description: Set a specific vhost for amqp relation. By default it's the unit_name.
+    wsgi_wsgi_file:
+        type: string
+        default: "wsgi"
+        description: "The name of the WSGI application."
+    wsgi_workers:
+        type: int
+        default: 0
+        description: "The number of worker process for handling requests. 0 for count(cpu) + 1"
+    wsgi_worker_class:
+        type: string
+        default: ""
+        description: "Socket protocol. Can be: http (default), uwsgi, fastcgi or workers type. Can be: sync (default), eventlet, gevent, tornado"
+    wsgi_worker_connections:
+        type: int
+        default: 128
+        description: "The maximum number of simultaneous clients."
+    wsgi_max_requests:
+        type: int
+        default: 0
+        description: "The maximum number of requests a worker will process before restarting."
+    wsgi_backlog:
+        type: int
+        default: 2048
+        description: "The maximum number of pending connections."
+    wsgi_timeout:
+        type: int
+        default: 30
+        description: "Timeout of a request in seconds."
+    wsgi_keep_alive:
+        type: int
+        default: 2
+        description: "Keep alive time in seconds."
+    wsgi_umask:
+        type: string
+        default: "0002"
+        description: "A bit mask for the file mode on files written."
+    wsgi_user:
+        type: string
+        default: "www-data"
+        description: "Switch worker processes to run as this user. User id (as an int) or the name."
+    wsgi_group:
+        type: string
+        default: "www-data"
+        description: "Switch worker process to run as this group. A valid group id (as an int) or the name."
+    wsgi_log_file:
+        type: string
+        default: ""
+        description: "The log file to write to. If empty the logs would be handle by upstart."
+    wsgi_log_level:
+        type: string
+        default: "info"
+        description: "The granularity of Error log outputs."
+    wsgi_access_logfile:
+        type: string
+        default: ""
+        description: "The Access log file to write to."
+    wsgi_access_logformat:
+        type: string
+        default: ""
+        description: "The Access log format. Don't forget to escape all quotes and round brackets."
+    wsgi_extra:
+        type: string
+        default: ""
+        description: "Space separated extra settings. For example: --debug"
+    wsgi_timestamp:
+        type: string
+        default: ""
+        description: "The variable to modify to trigger reloads."
+    python_path:
+        type: string
+        default: ""
+        description: "Set additionnals, colon separated, PYTHONPATH to the project."
+    listen_ip:
+        type: string
+        default: "0.0.0.0"
+        description: "IP adresses to listen on. By default we listen on all of them."
+    port:
+        type: int
+        default: 8080
+        description: "Port the application will be listenning."

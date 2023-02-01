@@ -13,10 +13,40 @@ display-name: Django Codenerix
 # (Required)
 summary: Open Source ERP built on top of Django + AngularJS + Bootstrap
 
+maintainer: Juanmi Taboada <juanmi@juanmitaboada.com>
+tags: ['databases', 'app-servers']
+
 description: |
   Open source enterprise business management system built on top of Django + AngularJS + Bootstrap.
  
   This framework is ready for fast development of any CMS, ERP, Business Management Software.
+
+provides:
+  website:
+    interface: http
+    optional: true
+  wsgi:
+    interface: wsgi
+    scope: container
+  django-settings:
+    interface: directory-path
+    scope: container
+
+requires:
+  pgsql:
+    interface: pgsql
+    optional: true
+  mysql:
+    interface: mysql
+  redis:
+    interface: redis
+    optional: true
+  memcache:
+      interface: memcached
+      optional: true
+#  elasticsearch:
+#    interface: elasticsearch
+#    optional: true
 
 storage:
   media:

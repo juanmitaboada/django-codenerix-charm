@@ -4,14 +4,6 @@
 #
 # Learn more at: https://juju.is/docs/sdk
 
-"""Charm the service.
-
-Refer to the following post for a quick-start guide that will help you
-develop a new k8s charm using the Operator Framework:
-
-https://discourse.charmhub.io/t/4208
-"""
-
 import os
 import logging
 import types
@@ -42,6 +34,7 @@ EMOJI_CHECK_MARK_BUTTON = "\U00002705"  # ✅
 EMOJI_CROSS_MARK_BUTTON = "\U0000274E"  # ❎
 EMOJI_COMPUTER_DISK = "\U0001F4BD"  # 💽
 EMOJI_ROCKET = "\U0001F680"  # 🚀
+EMOJI_DB = "\U0001F943"  # 🥃
 
 
 @contextmanager
@@ -195,20 +188,83 @@ class DjangoCodenerixCharm(CharmAutoBase):
         Learn more about config at https://juju.is/docs/sdk/config
         """
 
-        logger.info("CONFIG CHANGED")
-        self.unit.status = MaintenanceStatus("Config changed")
+        # logger.info("CONFIG CHANGED")
+        # self.unit.status = MaintenanceStatus("Config changed")
 
-        with virtualenv():
-            os.system("./manage.py migrate")
-            os.system("./manage.py touch")
-
-        logger.info("Ready (config changed")
+        logger.info("Ready (config changed)")
         self.unit.status = MaintenanceStatus("Ready (config changed)")
 
     @logdecorate(EMOJI_ROCKET)
     def _on_start(self, event):
         logger.info("START")
         self.unit.status = ActiveStatus("Start")
+
+    @logdecorate(EMOJI_DB)
+    def _on_mysql_relation_joined(self, event):
+        logger.info("DB JOINED")
+        self.unit.status = ActiveStatus("DB Joined")
+
+        # Old Secret API (don't do this at home)
+        event.relation.data[self.model.app]["username"] = "admin"
+        event.relation.data[self.model.app]["password"] = "admin"
+
+        # New Secret API
+        # content = {
+        #     "username": "admin",
+        #     "password": "admin",
+        # }
+        # secret = self.app.add_secret(content)
+        # secret.grant(event.relation)
+        # event.relation.data[self.app]["secret-id"] = secret.id
+
+        logger.info("Ready (db joined)")
+        self.unit.status = ActiveStatus("Ready (db joined)")
+
+    @logdecorate(EMOJI_DB)
+    def _on_mysql_relation_changed(self, event):
+        # relation-get database_name, creds, host/port
+        # write config for wordpress
+        # bounce codenerix
+
+        logger.info(f"IN: {event.relation.data}")
+        # logger.info(f"IN: {event.host}")
+
+        # IN: {
+        #       <ops.model.Unit django-codenerix/36>: {
+        #           'egress-subnets': '10.154.207.144/32',
+        #           'ingress-address': '10.154.207.144',
+        #           'private-address': '10.154.207.144'
+        #       },
+        #       <ops.model.Application django-codenerix>: {
+        #           'password': 'admin',
+        #           'username': 'admin'
+        #       },
+        #       <ops.model.Unit mysql/1>: {
+        #           'egress-subnets': '10.154.207.176/32',
+        #           'ingress-address': '10.154.207.176',
+        #           'private-address': '10.154.207.176'
+        #       },
+        #       <ops.model.Application mysql>: {}
+        # }
+
+        # username = event.relation.data[event.app]["username"]
+        # password = event.relation.data[event.app]["password"]
+        # self._configure_db_credentials(username, password)
+
+        logger.info("Ready (db changed)")
+        self.unit.status = ActiveStatus("Ready (db changed)")
+
+        # with virtualenv():
+        #     os.system("./manage.py migrate")
+        #     os.system("./manage.py touch")
+
+    # @logdecorate(EMOJI_COMPUTER_DISK)
+    # def _on_memcache_relation_joined(self, event):
+    #     pass
+
+    # @logdecorate(EMOJI_COMPUTER_DISK)
+    # def _on_memcache_relation_changed(self, event):
+    #    pass
 
     @logdecorate(EMOJI_COMPUTER_DISK)
     def _on_media_storage_detaching(self, event):
